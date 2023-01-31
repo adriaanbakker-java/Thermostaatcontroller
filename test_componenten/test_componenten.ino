@@ -1,0 +1,239 @@
+/*
+  test lcd met blink, relais en ntc weerstand
+*/
+
+#define portRelais  8
+// pin 14 hoog is relais aan, relaispinnen bovenaanzicht pinnen links: boven is vcc, midden signaal, onder gnd
+
+#define portMenu0  9
+// pin 15  is menu0 via 10k aan knooppunt, switch tussen knooppunt en vcc, 10k tussen knooppunt en gnd 
+#define portMenu1 10
+// pin 16 analoog aan menu0
+#define portMenu2 11
+// pin 17 analoog aan menu0
+
+#define portSensor A0
+// aan de NTC weerstand knooppunt 200 kOhm spanningsdeler, NTC zit aan de plus. 200 kOhm aan de gnd
+// analoge poort A0, fysieke pin 23, verbonden met NTC weerstand
+
+// Deze specifieke NTC heeft bij kamertemperatuur een weerstand van ongeveer 200K
+// Voor de beste resultaten moet het bereik van de NTC weerstand ervoor zorgend dat we ergens tussen de 
+// 0 en de 5 volt uitkomen. Bij 30 graden zitten we rond 150 kOhm. Bij 6 graden naar verwachting ergens
+// rond de 300 ohm. Beste waarde voor de andere weerstand in deze spanningsdeler
+// is ergens rond de 200K om een maximale resolutie te krijgen zijnde 175 stapjes van de 1024 stapjes in
+// de AD meting van de analoge poort:
+// bij 20 graden verschil, ongeveer 7 stapjes per graad Celsius, dus 0,14 graden per stapje. 
+// Wil je hogere resolutie dan zou je moeten versterken via een transistor.
+
+
+// NOKIA LCD 5110
+// van rechts naar links achterzijde met pinrij lcd boven
+// via weerstanden is de lcd beschermd, level shifter daardoor niet nodig
+
+//                   pin 1 lcd -      ground
+// .                 pin 2 lcd  -     backlight, via 330 ohm naar vcc
+//                   pin 3 lcd  -     vcc (5 volt)
+// poort 3 / pin 5   pin 4 lcd  -     clk - via 10k
+// poort 4 / pin 6   pin 5 lcd -      din - via 10k
+// poort 5 / pin 11  pin 6 lcd -      dc - via 10k
+// poort 7 / pin 13  pin 7 lcd -      sce - via 1k -- let op sce gaat naar poort 7 pin 13, niet naar poort 6 
+// poort 6 / pin 12  pin 8 lcd -      rst - via 10k 
+// 
+
+#define portLCD_clk 3
+#define portLCD_din 4
+#define portLCD_dc  5
+#define portLCD_sce 7
+#define portLCD_rst 6
+
+//AT24C256 driver CPP file
+#include "Arduino.h"
+#include "Wire.h"
+#include "AT24C256.h"
+
+#define LCD_CMD 0 
+const byte rst_pin = portLCD_rst;  // pin 1 LCD via 10k naar poort 6 arduino -- paars 
+const byte sce_pin = portLCD_sce;  // pin 2 LCD via 1k naar poort 7 arduino-- grijs
+const byte dc_pin  = portLCD_dc;  // pin 3 LCD via 10k naar poort 5 arduino -- blauw
+const byte din_pin = portLCD_din;  // pin 4 LCD via 10k naar poort 4 arduino -- groen
+const byte clk_pin = portLCD_clk;  // pin 5 LCD via 10k naar poort 3 arduino -- geel
+//         vcc_pin          pin 6 LCD naar 3.3 V pin van arduino, GEEN 5 volt!!
+//         led_pin          pin 7 via 330 ohm naar midden van 1k potmeter, laag is backlight aan
+//         gnd_pin          pin 8 van LCD naar GND pin van arduino
+
+
+
+#define portLedOut 13
+// poort 13 pin 19
+
+// i2c eeprom componentje heeft 4 pootjes
+// 1 = gnd
+// 2 = vcc
+// 3 = sda - fysieke pin 27 atmega
+// 4 = scl - fysieke pin 28 atmega
+
+
+
+AT24C256 eeprom(0x50, &Wire);
+
+#define CAANTAL 10 
+// aantal cellen van eeprom voor het testen
+
+void printArray(byte aData[]) {
+    for (int i = 1; i<=CAANTAL; i++) {
+      Serial.print(i);
+      Serial.print(":");
+      Serial.print(aData[i-1]);  
+      Serial.print(",");
+    }
+    Serial.println();
+}
+
+// LCD
+#include <PCD8544.h> 
+ PCD8544 lcd;
+
+void welcome() {
+   lcd.setCursor(0,0);
+  lcd.print("WELCOME ..");
+  lcd.setCursor(0, 1);
+  lcd.print(" adriaans");
+  lcd.setCursor(0,2);
+  lcd.print("testlcd");
+  lcd.setCursor(0,3);
+  lcd.print("controller");
+  lcd.setCursor(0,4);
+  lcd.print(":) :) :) ;)"); 
+}
+
+
+int meetTempSensor () {
+    int val;
+  double tot = 0;
+  int nrtimes = 8;
+  for (int i = 1; i <= nrtimes; i++) {
+       val = analogRead(portSensor);
+      delayMicroseconds(200);
+      val = analogRead(portSensor);
+      Serial.print(val);
+      Serial.print(' ');
+      tot += val;
+    }
+    Serial.println();
+    tot = tot/nrtimes;
+
+    return tot;
+}
+
+
+//There are two memory banks in the LCD, data/RAM and commands. This 
+//function sets the DC pin high or low depending, and then sends
+//the data byte
+void LCDWrite(byte data_or_command, byte data) {
+  digitalWrite(dc_pin, data_or_command); //Tell the LCD that we are writing either to data or a command
+
+  //Send the data
+  digitalWrite(sce_pin, LOW);
+  shiftOut(din_pin, clk_pin, MSBFIRST, data);
+  digitalWrite(sce_pin, HIGH);
+}
+
+
+//------------ checkEeprom() ----------------
+void checkEeprom() {
+  byte data[CAANTAL];
+   
+    // alles op nul zetten
+  for (int i = 1; i<=CAANTAL; i++) {
+      data[i-1] = i;  
+  }
+  Serial.println("schrijven:");
+  eeprom.write(0, (uint8_t*)data, sizeof(data));
+  delay(100);
+  printArray(data);
+  
+  // alles op nul zetten
+  for (int i = 1; i<=CAANTAL; i++) {
+      data[i-1] = 0;  
+  }
+
+  Serial.println("teruglezen:");
+  eeprom.read(0, (uint8_t*)data, sizeof(data));
+  delay(100);
+
+  printArray(data);
+  }
+//------------------- setup -----------------------
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  pinMode(portLedOut, OUTPUT);
+  pinMode(portRelais, OUTPUT);
+  pinMode(portSensor, INPUT);
+
+
+  pinMode(portMenu0, INPUT);
+  pinMode(portMenu1, INPUT);
+  pinMode(portMenu2, INPUT);
+  
+  
+  Serial.begin(9600);
+    Serial.println("LCD testprogramma testlcd NOKIA 5110..");
+
+  delay(1000);
+  lcd.begin(84, 48);
+  LCDWrite( LCD_CMD, 0xBf ); 
+  welcome();
+
+  
+  
+  eeprom.begin();
+  checkEeprom();
+}
+
+int i=0;
+
+// the loop function runs over and over again forever
+//----------------------------------------------------
+void loop() {
+  i = i+1;
+  i = i%10;
+
+  if (i%2 == 0) {
+     digitalWrite(portLedOut, HIGH);   // turn the LED on (HIGH is the voltage level)
+     digitalWrite(portRelais, HIGH);   // turn the LED on (HIGH is the voltage level)
+  } else {                       
+     digitalWrite(portLedOut, LOW);    // turn the LED off by making the voltage LOW
+     digitalWrite(portRelais, LOW);   // turn the LED on (HIGH is the voltage level)
+  }
+  delay(1000);                       // wait for a second
+  
+    lcd.setCursor(0, 0);
+    lcd.print("---------");
+    lcd.print(i);
+  
+  if (digitalRead(portMenu0) == HIGH) {
+    lcd.setCursor(0, 0);
+    lcd.print("menu0");
+  } 
+  if (digitalRead(portMenu1) == HIGH) {
+    lcd.setCursor(0, 0);
+    lcd.print("menu1");
+  } 
+  if (digitalRead(portMenu2) == HIGH) {
+    lcd.setCursor(0, 0);
+    lcd.print("menu2");
+  } 
+  int tempSensorWaarde = meetTempSensor();
+  Serial.print("temp:");
+  Serial.println(tempSensorWaarde);
+
+ // lcd.begin(84, 48);
+ // LCDWrite( LCD_CMD, 0xBf );
+  lcd.setCursor(0, 1);
+  lcd.print("sensor:");
+  lcd.print(tempSensorWaarde);
+
+ 
+}
