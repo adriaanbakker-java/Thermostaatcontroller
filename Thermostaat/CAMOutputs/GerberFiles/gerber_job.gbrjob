@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2023-01-18T13:28:11Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "Thermostaat"
+        },
+        "Owner": "A. Bakker <adriaan.f5.bakker@gmail.com>",
+        "Size": {
+            "X": 100,
+            "Y": 80
+        }
+    }
+}

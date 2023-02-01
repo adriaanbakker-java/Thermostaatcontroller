@@ -1,5 +1,30 @@
 /*
-  test lcd met blink, relais en ntc weerstand
+  Dit is een testprogramma om de standaardprint te testen.
+  Standaardprint bevat: 
+   - NOKIA LCD 5110, contactbusje 8 pins, van rechts naar links zijn dit
+     gnd, backlight (niet aangesloten), vcc, clk, din, dc, sce en rst
+   - NTC weerstand - deze heeft zijn eigen instelparameters voor omzetten naar temp, contactbusje 2 pins
+   - Drie menuknoppen, bovenaan print, van links naar rechts is dit menu2, menu1, menu0
+   - LED die knippert op het ritme waarmee ook het relais wordt bediend, is vast
+   - Relais dat een 220 volt aansluiting kan bedienen bij 10 A (Tongling, 5VDC), contactbusje 3 pins,
+     links is aarde, midden is signaal, rechts is vcc, 
+     pinnen links op relais zijn resp. boven links is vcc, midden is signaal, onder gnd
+   - EEprom extern 32 kByte, contactbusje 4 pins, gnd is linker pin, busje is onderaan de print
+     resp. gnd, vcc, sda, scl
+   - contactbusje 5 polig voor uitlezen log en voor het herprogrammeren, van links naar rechts is dit
+     rst, rx, tx, vcc, gnd
+   - 2 pins contactbusje voor de voeding, onder is gnd, boven is vcc
+
+   Zie voor de verdere beschrijving het document "temperatuur vastleggen met Arduino"
+
+   Deze code geldt verder als basis voor de thermostaatcontroller die onder meer ingezet wordt in het toilet en
+   als datalogger. Niet alle componenten zijn "verplicht":
+
+   - Bij de datalogger zijn de NTC weerstand, menuknoppen en de eeprom component noodzakelijk, 
+     rest is optioneel. Door bij een reboot (stroom aansluiten) de menuknop ingedrukt te houden wordt hetzij 
+     gelogd naar seriele poort
+   - Bij de thermostaatcontroller zijn de NTC weerstand, menuknoppen en het display noodzakelijk
+   - contactbusjes voor de verschillende componenten, led en menuknoppen zijn uiteraard altijd aanwezig op de print
 */
 
 #define portRelais  8
