@@ -38,72 +38,24 @@
 // pin 17 analoog aan menu0
 
 #define portSensor A0
-// aan de NTC weerstand knooppunt 200 kOhm spanningsdeler, NTC zit aan de plus. 200 kOhm aan de gnd
-// analoge poort A0, fysieke pin 23, verbonden met NTC weerstand
-
-// Deze specifieke NTC heeft bij kamertemperatuur een weerstand van ongeveer 200K
-// Voor de beste resultaten moet het bereik van de NTC weerstand ervoor zorgend dat we ergens tussen de 
-// 0 en de 5 volt uitkomen. Bij 30 graden zitten we rond 150 kOhm. Bij 6 graden naar verwachting ergens
-// rond de 300 ohm. Beste waarde voor de andere weerstand in deze spanningsdeler
-// is ergens rond de 200K om een maximale resolutie te krijgen zijnde 175 stapjes van de 1024 stapjes in
-// de AD meting van de analoge poort:
-// bij 20 graden verschil, ongeveer 7 stapjes per graad Celsius, dus 0,14 graden per stapje. 
-// Wil je hogere resolutie dan zou je moeten versterken via een transistor.
-
 
 #define portBewegingssensor A1
 // bewegingssensor heeft drie pootjes 
-
-// NOKIA LCD 5110
-// van rechts naar links achterzijde met pinrij lcd boven
-// via weerstanden is de lcd beschermd, level shifter daardoor niet nodig
-
-//                   pin 1 lcd -      ground
-// .                 pin 2 lcd  -     backlight, via 330 ohm naar vcc
-//                   pin 3 lcd  -     vcc (5 volt)
-// poort 3 / pin 5   pin 4 lcd  -     clk - via 10k
-// poort 4 / pin 6   pin 5 lcd -      din - via 10k
-// poort 5 / pin 11  pin 6 lcd -      dc - via 10k
-// poort 7 / pin 13  pin 7 lcd -      sce - via 1k -- let op sce gaat naar poort 7 pin 13, niet naar poort 6 
-// poort 6 / pin 12  pin 8 lcd -      rst - via 10k 
-// 
-
-#define portLCD_clk 3
-#define portLCD_din 4
-#define portLCD_dc  5
-#define portLCD_sce 7
-#define portLCD_rst 6
-
-
-
-
-#define LCD_CMD 0 
-const byte rst_pin = portLCD_rst;  // pin 1 LCD via 10k naar poort 6 arduino -- paars 
-const byte sce_pin = portLCD_sce;  // pin 2 LCD via 1k naar poort 7 arduino-- grijs
-const byte dc_pin  = portLCD_dc;  // pin 3 LCD via 10k naar poort 5 arduino -- blauw
-const byte din_pin = portLCD_din;  // pin 4 LCD via 10k naar poort 4 arduino -- groen
-const byte clk_pin = portLCD_clk;  // pin 5 LCD via 10k naar poort 3 arduino -- geel
-//         vcc_pin          pin 6 LCD naar 3.3 V pin van arduino, GEEN 5 volt!!
-//         led_pin          pin 7 via 330 ohm naar midden van 1k potmeter, laag is backlight aan
-//         gnd_pin          pin 8 van LCD naar GND pin van arduino
-
-
 
 #define portLedOut 13
 // poort 13 pin 19
 
 
-
-// LCD
-#include <PCD8544.h> 
- PCD8544 lcd;
-
-
-
-
-
 #include "Kachel.h"
 Kachel mijnKachel;
+
+#include "lcd.h"
+
+#include "TempSensor.h"
+TempSensor mijnTempSensor;
+
+#include "Clock.h"
+Clock mijnClock;
 
 void welcome() {
    lcd.setCursor(0,0);
@@ -115,58 +67,18 @@ void welcome() {
   lcd.setCursor(0,3);
   lcd.print("controller");
   lcd.setCursor(0,4);
-  lcd.print(":) :) :) ;)"); 
-}
-
-double calcTemp(int sensorValue) {
- int tot = sensorValue;
- double Rnc = (1023.00 -tot)/tot *100;
-    double lnRnc = log(Rnc);
-    
-// 4 feb 2023   567 komt overeen met 17,8 graden
-//              421 komt overeen met  7,1 graden
-    double B =   4385.497029;
-    double lnA = log(0.0000229); 
-    
-    double TKelvin = B / (lnRnc - lnA );
-    return TKelvin - 273.15;
-}
-
-int meetTempSensor () {
-    int val;
-  double tot = 0;
-  int nrtimes = 20;
-  for (int i = 1; i <= nrtimes; i++) {
-       val = analogRead(portSensor);
-      delayMicroseconds(200);
-      val = analogRead(portSensor);
-      Serial.print(val);
-      Serial.print(' ');
-      tot += val;
-    }
-    Serial.println();
-    tot = tot/nrtimes;
-
-    return tot;
-}
-
-
-//There are two memory banks in the LCD, data/RAM and commands. This 
-//function sets the DC pin high or low depending, and then sends
-//the data byte
-void LCDWrite(byte data_or_command, byte data) {
-  digitalWrite(dc_pin, data_or_command); //Tell the LCD that we are writing either to data or a command
-
-  //Send the data
-  digitalWrite(sce_pin, LOW);
-  shiftOut(din_pin, clk_pin, MSBFIRST, data);
-  digitalWrite(sce_pin, HIGH);
+  lcd.print(":) :) :) ;)");
+    delay(1000); 
 }
 
 
 
 
-int i;
+
+
+
+int iSeconds;
+
 //------------------- setup -----------------------
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -176,31 +88,24 @@ void setup() {
   pinMode(portRelais, OUTPUT);
   pinMode(portSensor, INPUT);
 
-
   pinMode(portMenu0, INPUT);
   pinMode(portMenu1, INPUT);
   pinMode(portMenu2, INPUT);
   
-  
   Serial.begin(9600);
-    Serial.println("LCD testprogramma testlcd NOKIA 5110..");
+  Serial.println("Thermostaat toilet versie 002");
 
-  delay(1000);
-  lcd.begin(84, 48);
-  LCDWrite( LCD_CMD, 0xBf ); 
+  lcdInit();
   welcome();
-
  
-  mijnKachel.init(8);
+  mijnKachel.init(portRelais);
+  mijnTempSensor.init(portSensor);
 
-  i=0;
+  mijnClock.resetClock();
+
+  iSeconds=0;
   lcd.clear();
 
-    Kachel mijnKachel;                
-   
-   // volume of box 1
-  
-   mijnKachel.init(portRelais);
 }
 
 
@@ -209,27 +114,35 @@ void setup() {
 // the loop function runs over and over again forever
 //----------------------------------------------------
 void loop() {
-  i = i+1;
-  i = i%20;
   lcd.setCursor(0, 0);
-  lcd.print("---------");
-  lcd.print(i);
-  lcd.print(" ");
 
-  int senseValue = meetTempSensor();
-
-  lcd.setCursor(0, 1);
-  if (i>10) {
-      lcd.print("ON ");
-      mijnKachel.zetKachelAan();
-  } else {
-      lcd.print("OFF");
-      mijnKachel.zetKachelUit();
-  }
-  lcd.setCursor(0, 2);
-  lcd.print(senseValue);
-  lcd.print(" ");
-  double temp = calcTemp(senseValue);
+  int senseValue = mijnTempSensor.meetTempSensor();
+  double temp = mijnTempSensor.calcTemp(senseValue);
   lcd.print(temp);
+  lcd.print("      ");
+  lcd.print(senseValue);
+ 
+  lcd.setCursor(0, 1);
+  char sBuffer[8];  //hh24:mm
+  mijnClock.geefTijdstring(sBuffer);
+  lcd.print(sBuffer);
+  
+  lcd.print("   ");
+  if (mijnClock.geefSeconden() %10 == 0) {
+     if (mijnKachel.isKachelAan()) {
+        mijnKachel.zetKachelUit();
+        lcd.print("OFF");
+     } else {
+        mijnKachel.zetKachelAan();
+        lcd.print("ON ");
+     }
+  }
+ 
+
+  
+  
   delay(1000);
+
+  mijnClock.incSeconds(1);
+
 }
