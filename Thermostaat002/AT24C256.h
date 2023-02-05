@@ -1,4 +1,4 @@
-// 24C256 EEPROM driver header file
+
 #ifndef AT24C256_h
 #define AT24C256_h
 

@@ -74,10 +74,8 @@
 #define portLCD_sce 7
 #define portLCD_rst 6
 
-//AT24C256 driver CPP file
-#include "Arduino.h"
-#include "Wire.h"
-#include "AT24C256.h"
+
+
 
 #define LCD_CMD 0 
 const byte rst_pin = portLCD_rst;  // pin 1 LCD via 10k naar poort 6 arduino -- paars 
@@ -94,35 +92,18 @@ const byte clk_pin = portLCD_clk;  // pin 5 LCD via 10k naar poort 3 arduino -- 
 #define portLedOut 13
 // poort 13 pin 19
 
-// i2c eeprom componentje heeft 4 pootjes
-// 1 = gnd
-// 2 = vcc
-// 3 = sda - fysieke pin 27 atmega
-// 4 = scl - fysieke pin 28 atmega
 
-
-
-AT24C256 eeprom(0x50, &Wire);
-
-#define CAANTAL 10 
-// aantal cellen van eeprom voor het testen
-
-void printArray(byte aData[]) {
-    for (int i = 1; i<=CAANTAL; i++) {
-      Serial.print(i);
-      Serial.print(":");
-      Serial.print(aData[i-1]);  
-      Serial.print(",");
-    }
-    Serial.println();
-}
 
 // LCD
 #include <PCD8544.h> 
  PCD8544 lcd;
 
+
+
+
+
 #include "Kachel.h"
-Kachel kachel; 
+Kachel mijnKachel;
 
 void welcome() {
    lcd.setCursor(0,0);
@@ -183,30 +164,7 @@ void LCDWrite(byte data_or_command, byte data) {
 }
 
 
-//------------ checkEeprom() ----------------
-void checkEeprom() {
-  byte data[CAANTAL];
-   
-    // alles op nul zetten
-  for (int i = 1; i<=CAANTAL; i++) {
-      data[i-1] = i;  
-  }
-  Serial.println("schrijven:");
-  eeprom.write(0, (uint8_t*)data, sizeof(data));
-  delay(100);
-  printArray(data);
-  
-  // alles op nul zetten
-  for (int i = 1; i<=CAANTAL; i++) {
-      data[i-1] = 0;  
-  }
 
-  Serial.println("teruglezen:");
-  eeprom.read(0, (uint8_t*)data, sizeof(data));
-  delay(100);
-
-  printArray(data);
-  }
 
 int i;
 //------------------- setup -----------------------
@@ -232,15 +190,17 @@ void setup() {
   LCDWrite( LCD_CMD, 0xBf ); 
   welcome();
 
-  
-  
-  eeprom.begin();
-  checkEeprom();
  
-  kachel.init(portRelais);
+  mijnKachel.init(8);
 
   i=0;
   lcd.clear();
+
+    Kachel mijnKachel;                
+   
+   // volume of box 1
+  
+   mijnKachel.init(portRelais);
 }
 
 
@@ -261,10 +221,10 @@ void loop() {
   lcd.setCursor(0, 1);
   if (i>10) {
       lcd.print("ON ");
-      kachel.zetKachelAan();
+      mijnKachel.zetKachelAan();
   } else {
       lcd.print("OFF");
-      kachel.zetKachelUit();
+      mijnKachel.zetKachelUit();
   }
   lcd.setCursor(0, 2);
   lcd.print(senseValue);
