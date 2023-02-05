@@ -51,6 +51,9 @@
 // Wil je hogere resolutie dan zou je moeten versterken via een transistor.
 
 
+#define portBewegingssensor A1
+// bewegingssensor heeft drie pootjes 
+
 // NOKIA LCD 5110
 // van rechts naar links achterzijde met pinrij lcd boven
 // via weerstanden is de lcd beschermd, level shifter daardoor niet nodig
@@ -218,6 +221,7 @@ void setup() {
 }
 
 int i=0;
+int moveCount = 0;
 
 // the loop function runs over and over again forever
 //----------------------------------------------------
@@ -225,13 +229,18 @@ void loop() {
   i = i+1;
   i = i%10;
 
-  if (i%2 == 0) {
-     digitalWrite(portLedOut, HIGH);   // turn the LED on (HIGH is the voltage level)
-     digitalWrite(portRelais, HIGH);   // turn the LED on (HIGH is the voltage level)
-  } else {                       
-     digitalWrite(portLedOut, LOW);    // turn the LED off by making the voltage LOW
-     digitalWrite(portRelais, LOW);   // turn the LED on (HIGH is the voltage level)
+  if (moveCount >0) {
+     moveCount--;
+  } else {
+      if (i%2 == 0) {
+         digitalWrite(portLedOut, HIGH);   // turn the LED on (HIGH is the voltage level)
+         digitalWrite(portRelais, HIGH);   // turn the LED on (HIGH is the voltage level)
+      } else {  
+         digitalWrite(portLedOut, LOW);    // turn the LED off by making the voltage LOW
+         digitalWrite(portRelais, LOW);   // turn the LED on (HIGH is the voltage level)               
+      }
   }
+  
   delay(1000);                       // wait for a second
   
     lcd.setCursor(0, 0);
@@ -250,6 +259,19 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("menu2");
   } 
+
+  byte bewSensor = analogRead(portBewegingssensor);
+  lcd.setCursor(0, 2);
+  lcd.print("          ");
+  lcd.setCursor(0, 2);
+  if (bewSensor > 10) {  
+     lcd.print("MOVE: ");
+     lcd.print(bewSensor);
+     moveCount = 2;
+  } else {
+    lcd.print("NONE:");
+     lcd.print(bewSensor);
+  }
   int tempSensorWaarde = meetTempSensor();
   Serial.print("temp:");
   Serial.println(tempSensorWaarde);

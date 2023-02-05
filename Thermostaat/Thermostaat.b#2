@@ -2595,8 +2595,8 @@ design rules under a new name.</description>
 <signal name="N$31">
 <contactref element="NTCWEERSTAND" pad="1"/>
 <contactref element="R15" pad="2"/>
-<contactref element="IC2" pad="24"/>
-<wire x1="8.89" y1="-3.81" x2="20.32" y2="41.91" width="0" layer="19" extent="1-1"/>
+<contactref element="IC2" pad="23"/>
+<wire x1="8.89" y1="-3.81" x2="22.86" y2="41.91" width="0" layer="19" extent="1-1"/>
 <wire x1="1.27" y1="-13.97" x2="8.89" y2="-3.81" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>

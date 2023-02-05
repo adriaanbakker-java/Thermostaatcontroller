@@ -9038,15 +9038,18 @@ rectangle, 5.7 x 3.2 mm</description>
 <wire x1="25.4" y1="63.5" x2="27.94" y2="63.5" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$29" class="0">
+<net name="N$31" class="0">
 <segment>
-<pinref part="NTCWEERSTAND" gate="G$1" pin="1"/>
 <pinref part="R15" gate="G$1" pin="2"/>
+<pinref part="NTCWEERSTAND" gate="G$1" pin="1"/>
 <wire x1="38.1" y1="68.58" x2="38.1" y2="63.5" width="0.1524" layer="91"/>
-<pinref part="IC2" gate="G$1" pin="PC0(ADC0)"/>
+<pinref part="IC2" gate="G$1" pin="PC1(ADC1)"/>
+<wire x1="48.26" y1="50.8" x2="48.26" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="53.34" x2="48.26" y2="63.5" width="0.1524" layer="91"/>
 <wire x1="48.26" y1="63.5" x2="38.1" y2="63.5" width="0.1524" layer="91"/>
 <junction x="38.1" y="63.5"/>
+<pinref part="IC2" gate="G$1" pin="PC0(ADC0)"/>
+<junction x="48.26" y="53.34"/>
 </segment>
 </net>
 </nets>

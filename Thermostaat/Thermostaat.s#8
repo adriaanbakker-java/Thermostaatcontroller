@@ -8823,6 +8823,9 @@ Source: http://catalog.osram-os.com .. LA_LR_LS_LY_P47F_Pb_free.pdf</description
 <wire x1="-12.7" y1="43.18" x2="-12.7" y2="17.78" width="0.1524" layer="91"/>
 <wire x1="-12.7" y1="17.78" x2="-5.08" y2="17.78" width="0.1524" layer="91"/>
 <junction x="-5.08" y="17.78"/>
+<pinref part="SV1" gate="G$1" pin="3"/>
+<wire x1="-10.16" y1="63.5" x2="-25.4" y2="63.5" width="0.1524" layer="91"/>
+<junction x="-25.4" y="63.5"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -8908,6 +8911,9 @@ Source: http://catalog.osram-os.com .. LA_LR_LS_LY_P47F_Pb_free.pdf</description
 <junction x="10.16" y="-99.06"/>
 <pinref part="R11" gate="G$1" pin="1"/>
 <wire x1="22.86" y1="-93.98" x2="22.86" y2="-99.06" width="0.1524" layer="91"/>
+<pinref part="SV1" gate="G$1" pin="1"/>
+<wire x1="-10.16" y1="60.96" x2="-25.4" y2="60.96" width="0.1524" layer="91"/>
+<junction x="-25.4" y="60.96"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -8919,6 +8925,9 @@ Source: http://catalog.osram-os.com .. LA_LR_LS_LY_P47F_Pb_free.pdf</description
 <wire x1="-38.1" y1="78.74" x2="-38.1" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="SV1" gate="G$1" pin="6"/>
 <wire x1="-38.1" y1="66.04" x2="-25.4" y2="66.04" width="0.1524" layer="91"/>
+<pinref part="SV1" gate="G$1" pin="5"/>
+<wire x1="-10.16" y1="66.04" x2="-25.4" y2="66.04" width="0.1524" layer="91"/>
+<junction x="-25.4" y="66.04"/>
 </segment>
 </net>
 <net name="N$4" class="0">
@@ -8930,6 +8939,9 @@ Source: http://catalog.osram-os.com .. LA_LR_LS_LY_P47F_Pb_free.pdf</description
 <wire x1="58.42" y1="76.2" x2="58.42" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="IC2" gate="G$1" pin="PC5(ADC5/SCL)"/>
 <wire x1="58.42" y1="40.64" x2="48.26" y2="40.64" width="0.1524" layer="91"/>
+<pinref part="SV1" gate="G$1" pin="7"/>
+<wire x1="-25.4" y1="68.58" x2="-10.16" y2="68.58" width="0.1524" layer="91"/>
+<junction x="-25.4" y="68.58"/>
 </segment>
 </net>
 <net name="N$7" class="0">
