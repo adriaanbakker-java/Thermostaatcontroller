@@ -17,7 +17,9 @@ class TempSensor {
       void init(int aSensorPort);
       double calcTemp(int sensorValue);
       int meetTempSensor ();
+      
    private:
       int sensorPort;
+      
   
 };

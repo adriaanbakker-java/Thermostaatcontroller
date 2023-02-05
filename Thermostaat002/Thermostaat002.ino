@@ -57,6 +57,9 @@ TempSensor mijnTempSensor;
 #include "Clock.h"
 Clock mijnClock;
 
+#include "Thermos.h"
+Thermos mijnThermos;
+
 void welcome() {
    lcd.setCursor(0,0);
   lcd.print("WELCOME ..");
@@ -74,10 +77,6 @@ void welcome() {
 
 
 
-
-
-
-int iSeconds;
 
 //------------------- setup -----------------------
 void setup() {
@@ -103,13 +102,15 @@ void setup() {
 
   mijnClock.resetClock();
 
-  iSeconds=0;
+  mijnThermos.init();
+  
   lcd.clear();
 
 }
 
 
 
+  char sBuffer[30];  
 
 // the loop function runs over and over again forever
 //----------------------------------------------------
@@ -123,7 +124,6 @@ void loop() {
   lcd.print(senseValue);
  
   lcd.setCursor(0, 1);
-  char sBuffer[8];  //hh24:mm
   mijnClock.geefTijdstring(sBuffer);
   lcd.print(sBuffer);
   
@@ -139,6 +139,13 @@ void loop() {
   }
  
 
+  lcd.setCursor(0, 2);
+  mijnThermos.geefHuidigSchemaNaam(sBuffer);
+  lcd.print(sBuffer);
+  lcd.print(" ");
+  lcd.print(mijnThermos.getTempAan());
+  lcd.print(" ");
+  lcd.print(mijnThermos.getTempUit());
   
   
   delay(1000);
