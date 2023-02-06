@@ -18,6 +18,8 @@
       seconden = 0;
       minuten = 0;
       uren = 0;
+      timerMinuten = 0;
+      timerSeconden = 0;
     }
    
     void Clock::geefTijdstring(char buffer[]) {
@@ -40,14 +42,29 @@
         } else {
           sprintf(sSeconden, "%d", seconden);
         }
-        sprintf(buffer, "%s:%s:%s\0", sHours, sMinutes, sSeconden);
+        sprintf(buffer, "%s:%s:%s", sHours, sMinutes, sSeconden);
     }
 
     void Clock::incSeconds(int aSeconden) {
+       if (timerMinuten < 24*60) {
+         timerSeconden += aSeconden;
+         timerMinuten += timerSeconden / secondsPerMinute;
+         timerSeconden %= secondsPerMinute;
+       }
+       
        seconden += aSeconden;
        minuten += seconden / secondsPerMinute;
        seconden %= secondsPerMinute;
        uren += minuten / minutesPerHour;
        minuten %= minutesPerHour;
        uren %= hoursPerDay;
+    }
+
+    void Clock::startTimer() {
+        timerMinuten = 0;
+        timerSeconden = 0;
+    }
+
+    int Clock::geefTimerMinuten() {
+        return timerMinuten;
     }

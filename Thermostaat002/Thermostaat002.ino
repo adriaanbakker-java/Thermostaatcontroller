@@ -117,6 +117,7 @@ void setup() {
 void loop() {
   lcd.setCursor(0, 0);
 
+  
   int senseValue = mijnTempSensor.meetTempSensor();
   double temp = mijnTempSensor.calcTemp(senseValue);
   lcd.print(temp);
@@ -128,17 +129,32 @@ void loop() {
   lcd.print(sBuffer);
   
   lcd.print("   ");
-  if (mijnClock.geefSeconden() %10 == 0) {
-     if (mijnKachel.isKachelAan()) {
-        mijnKachel.zetKachelUit();
-        lcd.print("OFF");
-     } else {
-        mijnKachel.zetKachelAan();
-        lcd.print("ON ");
-     }
-  }
- 
+//  if (mijnClock.geefSeconden() %10 == 0) {
+//     if (mijnKachel.isKachelAan()) {
+//        mijnKachel.zetKachelUit();
+//        lcd.print("OFF");
+//     } else {
+//        mijnKachel.zetKachelAan();
+//        lcd.print("ON ");
+//     }
+//  }
 
+  if (temp < mijnThermos.getTempAan()) {
+    mijnKachel.zetKachelAan();
+  }
+
+  if (temp > mijnThermos.getTempUit()) {
+    mijnKachel.zetKachelUit();
+  }
+
+  if (mijnKachel.isKachelAan()) {
+      lcd.print("ON ");
+  } else {
+      lcd.print("OFF");
+  }
+
+  lcd.setCursor(0, 2);
+  lcd.print("              ");
   lcd.setCursor(0, 2);
   mijnThermos.geefHuidigSchemaNaam(sBuffer);
   lcd.print(sBuffer);
@@ -147,9 +163,21 @@ void loop() {
   lcd.print(" ");
   lcd.print(mijnThermos.getTempUit());
   
-  
+
+
+
+  lcd.setCursor(0, 3);
+  lcd.print(mijnClock.geefTimerMinuten());
+  lcd.print(" ");
+  int huidigSchemaNr = mijnThermos.getHuidigSchemaNr();
+  lcd.print(mijnThermos.geefTimeout(huidigSchemaNr));
   delay(1000);
 
   mijnClock.incSeconds(1);
-
+  if (mijnClock.geefSeconden() %20 == 0) {
+    boolean bSwitched = mijnThermos.checkSetSchema(mijnClock.geefTimerMinuten());
+    if (bSwitched) {
+        mijnClock.startTimer();
+    }
+  }
 }
