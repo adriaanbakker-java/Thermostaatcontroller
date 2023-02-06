@@ -129,24 +129,19 @@ void loop() {
   lcd.print(sBuffer);
   
   lcd.print("   ");
-//  if (mijnClock.geefSeconden() %10 == 0) {
-//     if (mijnKachel.isKachelAan()) {
-//        mijnKachel.zetKachelUit();
-//        lcd.print("OFF");
-//     } else {
-//        mijnKachel.zetKachelAan();
-//        lcd.print("ON ");
-//     }
-//  }
 
-  if (temp < mijnThermos.getTempAan()) {
-    mijnKachel.zetKachelAan();
+  if (mijnThermos.getHuidigSchemaNr() == huidigSchemaUitNr) {
+      mijnKachel.zetKachelUit();
+  } else {
+      if (temp < mijnThermos.getTempAan()) {
+        mijnKachel.zetKachelAan();
+      }
+    
+      if (temp > mijnThermos.getTempUit()) {
+        mijnKachel.zetKachelUit();
+      }
   }
-
-  if (temp > mijnThermos.getTempUit()) {
-    mijnKachel.zetKachelUit();
-  }
-
+  
   if (mijnKachel.isKachelAan()) {
       lcd.print("ON ");
   } else {
