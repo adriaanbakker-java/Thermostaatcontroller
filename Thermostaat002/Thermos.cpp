@@ -110,11 +110,17 @@ void Thermos::incTempAan(byte aSchemaNr, double aIncrement) {
 }
 
 void Thermos::incTempUit(byte aSchemaNr, double aIncrement) {
+//    Serial.print("incTempUit ");
+//    Serial.print(aSchemaNr);
+//    Serial.print(" ");
+//    Serial.println(aIncrement);
     if (aSchemaNr == huidigSchemaActiefNr) {
         if (tempUit + aIncrement >= tempAan + 0.4)
              tempUit += aIncrement;
     } else   if (aSchemaNr == huidigSchemaPauzeNr) {
-        if (tempUitPauze + aIncrement >= tempUitPauze + 0.4)
+        if (tempUitPauze + aIncrement >= tempAanPauze + 0.4)
              tempUitPauze += aIncrement;
+//        Serial.print("tempUitPauze wordt:");
+//        Serial.println(tempUitPauze);
     } 
 }
