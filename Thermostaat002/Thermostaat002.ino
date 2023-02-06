@@ -60,6 +60,9 @@ Clock mijnClock;
 #include "Thermos.h"
 Thermos mijnThermos;
 
+#include "Menu.h"
+Menu mijnMenu;
+
 void welcome() {
    lcd.setCursor(0,0);
   lcd.print("WELCOME ..");
@@ -106,6 +109,8 @@ void setup() {
   
   lcd.clear();
 
+  // rijtje menuknoppen zit precies andersom op de print
+  mijnMenu.init(&lcd, portMenu2, portMenu1, portMenu0);
 }
 
 
@@ -168,6 +173,8 @@ void loop() {
   lcd.print(mijnThermos.geefTimeout(huidigSchemaNr));
   delay(1000);
 
+  mijnMenu.checkMenuKey();
+
   mijnClock.incSeconds(1);
   if (mijnClock.geefSeconden() %20 == 0) {
     boolean bSwitched = mijnThermos.checkSetSchema(mijnClock.geefTimerMinuten());
@@ -175,4 +182,7 @@ void loop() {
         mijnClock.startTimer();
     }
   }
+
+
+  
 }
