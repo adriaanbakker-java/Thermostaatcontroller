@@ -97,3 +97,24 @@ void Thermos::switchNaarUit() {
    Serial.println("switch naar uit");
    huidigSchemaNr = huidigSchemaUitNr;
 }
+
+void Thermos::incTempAan(byte aSchemaNr, double aIncrement) {
+    if (aSchemaNr == huidigSchemaActiefNr) {
+       if (tempAan + aIncrement <= tempUit - 0.4)
+             tempAan += aIncrement;
+    } else   
+    if (aSchemaNr == huidigSchemaPauzeNr) {
+       if (tempAanPauze + aIncrement <= tempUitPauze - 0.4)
+             tempAanPauze += aIncrement;
+    } 
+}
+
+void Thermos::incTempUit(byte aSchemaNr, double aIncrement) {
+    if (aSchemaNr == huidigSchemaActiefNr) {
+        if (tempUit + aIncrement >= tempAan + 0.4)
+             tempUit += aIncrement;
+    } else   if (aSchemaNr == huidigSchemaPauzeNr) {
+        if (tempUitPauze + aIncrement >= tempUitPauze + 0.4)
+             tempUitPauze += aIncrement;
+    } 
+}

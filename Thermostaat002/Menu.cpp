@@ -120,7 +120,16 @@
       myLCD->print(myThermos->getTempUit(aSchemaNr)); 
     } 
 
-    
+    void Menu::verstelTemperatuur( byte aSchemaNr, boolean aIsTempAan, boolean aIsPlus) {
+       double temp = aIsTempAan ? myThermos->getTempAan(aSchemaNr) : myThermos->getTempUit(aSchemaNr);
+       double increment = aIsPlus ? 0.1 : -0.1;
+       if (aIsTempAan) { 
+          myThermos->incTempAan(aSchemaNr, increment);
+       } else {
+          myThermos->incTempUit(aSchemaNr, increment);
+       }
+       toonTemperaturen(aSchemaNr);
+    } 
 
     void Menu::verstelTemperaturen( byte aSchemaNr ) {
         myLCD->clear();
@@ -144,12 +153,12 @@
         do {
             delay(500);
             keuze = getMenuKey();
-            if (keuze == 2) Serial.println("2");
-            if (keuze == 3) Serial.println("3");
+            if (keuze == 2) verstelTemperatuur(aSchemaNr, true, true);
+            if (keuze == 3)  verstelTemperatuur(aSchemaNr, true, false);
             //12
-            if (keuze == 4) Serial.println("12");
+            if (keuze == 4)  verstelTemperatuur(aSchemaNr, false, true);
             //23
-            if (keuze == 5) Serial.println("23");
+            if (keuze == 5)  verstelTemperatuur(aSchemaNr, false, false);
          } while (keuze != 1);
     }
 

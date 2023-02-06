@@ -23,6 +23,7 @@ class Menu {
 
       byte doSelect( char *titel, char *keuze1, char* keuze2, char* keuze3);
       void verstelTemperaturen( byte aSchemaNr );
+      void verstelTemperatuur( byte aSchemaNr, boolean aIsTempAan, boolean aIsPlus); 
       void verstelTimeout( byte aSchemaNr );
       void toonTemperaturen( byte aSchemaNr);
 };
