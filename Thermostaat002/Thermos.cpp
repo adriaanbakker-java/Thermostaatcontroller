@@ -16,8 +16,8 @@ void Thermos::init() {
       huidigSchemaNr = huidigSchemaActiefNr;
 }
 
-double Thermos::getTempAan() {
-    switch (huidigSchemaNr) {
+double Thermos::getTempAan(byte aSchemaNr) {
+    switch (aSchemaNr) {
     case huidigSchemaActiefNr: return tempAan;
     case huidigSchemaPauzeNr: return tempAanPauze;
     case huidigSchemaUitNr: return 0.0;
@@ -25,8 +25,8 @@ double Thermos::getTempAan() {
    }
 }
 
-double Thermos::getTempUit() {
-    switch (huidigSchemaNr) {
+double Thermos::getTempUit(byte aSchemaNr) {
+    switch (aSchemaNr) {
     case huidigSchemaActiefNr: return tempUit;
     case huidigSchemaPauzeNr: return tempUitPauze;
     case huidigSchemaUitNr: return 0.0;
@@ -34,8 +34,8 @@ double Thermos::getTempUit() {
    }
 }
 
-void Thermos::geefHuidigSchemaNaam(char buffer[]) {
-   switch (huidigSchemaNr) {
+void Thermos::geefSchemaNaam(char buffer[], byte aSchemaNr) {
+   switch (aSchemaNr) {
     case huidigSchemaActiefNr: sprintf(buffer, huidigSchemaActief); return;
     case huidigSchemaPauzeNr: sprintf(buffer, huidigSchemaPauze); return;
     case huidigSchemaUitNr: sprintf(buffer, huidigSchemaUit); return;

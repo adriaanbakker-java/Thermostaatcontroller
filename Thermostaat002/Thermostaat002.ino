@@ -110,7 +110,9 @@ void setup() {
   lcd.clear();
 
   // rijtje menuknoppen zit precies andersom op de print
-  mijnMenu.init(&lcd, portMenu2, portMenu1, portMenu0);
+  mijnMenu.init(&lcd, &mijnThermos, portMenu2, portMenu1, portMenu0);
+  
+
 }
 
 
@@ -120,6 +122,7 @@ void setup() {
 // the loop function runs over and over again forever
 //----------------------------------------------------
 void loop() {
+  lcd.clear();
   lcd.setCursor(0, 0);
 
   
@@ -138,39 +141,42 @@ void loop() {
   if (mijnThermos.getHuidigSchemaNr() == huidigSchemaUitNr) {
       mijnKachel.zetKachelUit();
   } else {
-      if (temp < mijnThermos.getTempAan()) {
+      if (temp < mijnThermos.getTempAan(mijnThermos.getHuidigSchemaNr())) {
         mijnKachel.zetKachelAan();
       }
     
-      if (temp > mijnThermos.getTempUit()) {
+      if (temp > mijnThermos.getTempUit(mijnThermos.getHuidigSchemaNr())) {
         mijnKachel.zetKachelUit();
       }
   }
   
   if (mijnKachel.isKachelAan()) {
-      lcd.print("ON ");
+      lcd.print("AAN");
   } else {
-      lcd.print("OFF");
+      lcd.print("UIT");
   }
 
-  lcd.setCursor(0, 2);
-  lcd.print("              ");
-  lcd.setCursor(0, 2);
-  mijnThermos.geefHuidigSchemaNaam(sBuffer);
-  lcd.print(sBuffer);
-  lcd.print(" ");
-  lcd.print(mijnThermos.getTempAan());
-  lcd.print(" ");
-  lcd.print(mijnThermos.getTempUit());
   
 
 
 
   lcd.setCursor(0, 3);
+  mijnThermos.geefSchemaNaam(sBuffer, mijnThermos.getHuidigSchemaNr());
+  lcd.print(sBuffer);
+  lcd.print(" ");
   lcd.print(mijnClock.geefTimerMinuten());
   lcd.print(" ");
   int huidigSchemaNr = mijnThermos.getHuidigSchemaNr();
   lcd.print(mijnThermos.geefTimeout(huidigSchemaNr));
+
+  lcd.setCursor(0, 4);
+  lcd.print(mijnThermos.getTempAan(mijnThermos.getHuidigSchemaNr()));
+  lcd.print(" ");
+  lcd.print(mijnThermos.getTempUit(mijnThermos.getHuidigSchemaNr()));
+  
+  lcd.setCursor(0,5);
+  lcd.print("1=menu");
+  
   delay(1000);
 
   mijnMenu.checkMenuKey();

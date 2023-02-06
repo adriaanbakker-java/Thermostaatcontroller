@@ -1,20 +1,24 @@
+
+#ifndef Thermos_h
+#define Thermos_h
+
 #include "arduino.h"
 
 
-#define huidigSchemaActief "A"
-#define huidigSchemaPauze  "P"
-#define huidigSchemaUit    "X"
-#define huidigSchemaActiefNr 2
-#define huidigSchemaPauzeNr  1
+#define huidigSchemaActief "Actief"
+#define huidigSchemaPauze  "Pauze "
+#define huidigSchemaUit    "Uit   "
+#define huidigSchemaActiefNr 1
+#define huidigSchemaPauzeNr  2
 #define huidigSchemaUitNr    0
 
 
 class Thermos {
    public:
       void init();
-      double getTempAan();
-      double getTempUit();
-      void  geefHuidigSchemaNaam(char buffer[]);
+      double getTempAan(byte aSchemaNr);
+      double getTempUit(byte aSchemaNr);
+      void  geefSchemaNaam(char buffer[], byte aSchemaNr);
       byte   getHuidigSchemaNr();
       int   geefTimeout(byte aSchemaNr);
       boolean checkSetSchema(int aTimerMinuten);
@@ -29,3 +33,4 @@ class Thermos {
       void switchNaarUit();
 
 };
+#endif
