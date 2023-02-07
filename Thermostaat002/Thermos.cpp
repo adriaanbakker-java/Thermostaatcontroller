@@ -2,10 +2,6 @@
 #include "Thermos.h"
 
 
-#define timerwaardeActief 1
-// 15 minuten op actief na detectie persoon, daarna pauze
-#define timerwaardePauze 3 
-// 4 uur lang op pauze, daarna naar uit
 
 
 void Thermos::init() {
@@ -13,6 +9,8 @@ void Thermos::init() {
       tempUit = 25.0;
       tempAanPauze = 22.0;
       tempUitPauze = 23.0;
+      timeoutActief = 1;   // 1 minuut en dan naar pauzeschema
+      timeoutPauze = 3;    // 3 minuten en dan uit
       huidigSchemaNr = huidigSchemaActiefNr;
 }
 
@@ -79,9 +77,9 @@ boolean Thermos::checkSetSchema(int aTimerMinuten) {
 int Thermos::geefTimeout(byte aSchemaNr) {
   switch (aSchemaNr) {
     case huidigSchemaActiefNr: 
-      return timerwaardeActief; 
+      return timeoutActief; 
     case huidigSchemaPauzeNr: 
-      return timerwaardePauze;
+      return timeoutPauze;
     case huidigSchemaUitNr: return 0;
     default:  return -1;  
    }
@@ -110,17 +108,29 @@ void Thermos::incTempAan(byte aSchemaNr, double aIncrement) {
 }
 
 void Thermos::incTempUit(byte aSchemaNr, double aIncrement) {
-//    Serial.print("incTempUit ");
-//    Serial.print(aSchemaNr);
-//    Serial.print(" ");
-//    Serial.println(aIncrement);
     if (aSchemaNr == huidigSchemaActiefNr) {
         if (tempUit + aIncrement >= tempAan + 0.4)
              tempUit += aIncrement;
     } else   if (aSchemaNr == huidigSchemaPauzeNr) {
         if (tempUitPauze + aIncrement >= tempAanPauze + 0.4)
              tempUitPauze += aIncrement;
-//        Serial.print("tempUitPauze wordt:");
-//        Serial.println(tempUitPauze);
     } 
+}
+
+void Thermos::incTimeout(byte aSchemaNr) {
+    Serial.println("inc Timeout voor schema ");
+    Serial.println(aSchemaNr);
+    if (aSchemaNr == huidigSchemaActiefNr)
+      timeoutActief++;   
+    if (aSchemaNr == huidigSchemaPauzeNr)
+      timeoutPauze++;   
+}
+
+void Thermos::decTimeout(byte aSchemaNr) {
+    Serial.println("dec Timeout voor schema ");
+    Serial.println(aSchemaNr);
+    if (aSchemaNr == huidigSchemaActiefNr)
+      if (timeoutActief >0) timeoutActief--;   
+    if (aSchemaNr == huidigSchemaPauzeNr)
+      if (timeoutPauze >0) timeoutPauze--;      
 }

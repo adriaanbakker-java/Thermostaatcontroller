@@ -17,7 +17,7 @@
 
   
      void Menu::hoofdMenu() {
-          byte key = doSelect("hoofdmenu", "actief schema", "pauzeschema", "");
+          byte key = doSelect("hoofdmenu", "actiefschema", "pauzeschema", "");
 
              do {
                 if (key == 2) {
@@ -120,6 +120,8 @@
       myLCD->print(myThermos->getTempUit(aSchemaNr)); 
     } 
 
+    
+
     void Menu::verstelTemperatuur( byte aSchemaNr, boolean aIsTempAan, boolean aIsPlus) {
        double temp = aIsTempAan ? myThermos->getTempAan(aSchemaNr) : myThermos->getTempUit(aSchemaNr);
        double increment = aIsPlus ? 0.1 : -0.1;
@@ -142,11 +144,14 @@
         myLCD->print(sTitel);
         
         myLCD->setCursor(0, 2);
-        myLCD->print("2++ 3--");
+        myLCD->print("2=++ 3=--");
        
         myLCD->setCursor(0, 4);
-        myLCD->print("12++ 23--");
-
+        myLCD->print("12=++ 23=--");
+        
+        myLCD->setCursor(0, 5);
+        myLCD->print("1=terug");
+        
         toonTemperaturen(aSchemaNr);
         
         byte keuze;
@@ -162,15 +167,45 @@
          } while (keuze != 1);
     }
 
+
+   void Menu::toonTimeout( byte aSchemaNr) {
+      myLCD->setCursor(0, 1);
+      myLCD->print(myThermos->geefTimeout(aSchemaNr));
+    } 
+
+    void Menu::incTimeout( byte aSchemaNr, boolean aPlus) {
+        int timeOut = myThermos->geefTimeout(aSchemaNr);
+        if (aPlus) { 
+          myThermos->incTimeout(aSchemaNr);
+       } else {
+          myThermos->decTimeout(aSchemaNr);
+       }     
+    }
+
      void Menu::verstelTimeout( byte aSchemaNr ) {
         myLCD->clear();
-        myLCD->print("timeout: ");
+        myLCD->print("timeout:");
         char sBuffer[30];
         myThermos->geefSchemaNaam(sBuffer, aSchemaNr);
         myLCD->print(sBuffer);
+
+        toonTimeout(aSchemaNr);
+
+        myLCD->setCursor(0, 2);
+        myLCD->print("2=++ 3=--");
+        
         byte keuze;
         do {
+            delay(500);
             keuze = getMenuKey();
+            if (keuze == 2) {
+                incTimeout(aSchemaNr, true);
+                toonTimeout(aSchemaNr);
+            }
+            if (keuze == 3) {
+                incTimeout(aSchemaNr, false);
+                toonTimeout(aSchemaNr);
+            }
          } while (keuze != 1);
     }
      

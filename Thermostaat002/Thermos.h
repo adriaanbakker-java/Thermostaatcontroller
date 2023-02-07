@@ -25,11 +25,19 @@ class Thermos {
 
       void incTempAan(byte aSchemaNr, double aIncrement);
       void incTempUit(byte aSchemaNr, double aIncrement);
+      void incTimeout(byte aSchemaNr);
+      void decTimeout(byte aSchemaNr);
+
+
    private:
       double  tempAan;
       double  tempUit; 
       double  tempAanPauze;
       double  tempUitPauze;  
+
+      int timeoutActief;
+      int timeoutPauze;
+      
       byte    huidigSchemaNr;    // 0 = uit, 1 = pauze, 2 = actief
       void switchNaarActief();
       void switchNaarPauze();
