@@ -5,12 +5,12 @@
 
 
 void Thermos::init() {
-      tempAan = 23.0;
-      tempUit = 25.0;
-      tempAanPauze = 22.0;
-      tempUitPauze = 23.0;
-      timeoutActief = 1;   // 1 minuut en dan naar pauzeschema
-      timeoutPauze = 3;    // 3 minuten en dan uit
+      tempAan = 18.0;
+      tempUit = 19.0;
+      tempAanPauze = 15.0;
+      tempUitPauze = 16.0;
+      timeoutActief = 5;   // 5 minuten en dan naar pauzeschema
+      timeoutPauze = 120;    // 120 minuten en dan uit
       huidigSchemaNr = huidigSchemaActiefNr;
 }
 
@@ -43,6 +43,10 @@ void Thermos::geefSchemaNaam(char buffer[], byte aSchemaNr) {
 
 byte Thermos::getHuidigSchemaNr() {
     return huidigSchemaNr;
+}
+
+void Thermos::setSchemaActief() {
+    huidigSchemaNr = huidigSchemaActiefNr;
 }
 
 boolean Thermos::checkSetSchema(int aTimerMinuten) {
@@ -117,20 +121,22 @@ void Thermos::incTempUit(byte aSchemaNr, double aIncrement) {
     } 
 }
 
-void Thermos::incTimeout(byte aSchemaNr) {
+void Thermos::incTimeout(byte aSchemaNr, boolean aDelta10) {
     Serial.println("inc Timeout voor schema ");
     Serial.println(aSchemaNr);
+    int delta = aDelta10? 10 : 1;
     if (aSchemaNr == huidigSchemaActiefNr)
-      timeoutActief++;   
+      timeoutActief += delta;   
     if (aSchemaNr == huidigSchemaPauzeNr)
-      timeoutPauze++;   
+      timeoutPauze += delta;   
 }
 
-void Thermos::decTimeout(byte aSchemaNr) {
+void Thermos::decTimeout(byte aSchemaNr, boolean aDelta10) {
     Serial.println("dec Timeout voor schema ");
     Serial.println(aSchemaNr);
+    int delta = aDelta10? 10 : 1;
     if (aSchemaNr == huidigSchemaActiefNr)
-      if (timeoutActief >0) timeoutActief--;   
+      if (timeoutActief-delta > 0) timeoutActief -= delta;   
     if (aSchemaNr == huidigSchemaPauzeNr)
-      if (timeoutPauze >0) timeoutPauze--;      
+      if (timeoutPauze-delta > 0) timeoutPauze -= delta;      
 }

@@ -47,7 +47,7 @@
         if (digitalRead(portKey1) == HIGH) {
           delay(200);
           if (digitalRead(portKey0) == HIGH) return 4; // 1,2 samen ingedrukt
-          if (digitalRead(portKey2) == HIGH) return 5; // 2,3 samen ingedru
+          if (digitalRead(portKey2) == HIGH) return 5; // 2,3 samen ingedrukt
           return 2;
         }
         if (digitalRead(portKey2) == HIGH) {
@@ -173,12 +173,12 @@
       myLCD->print(myThermos->geefTimeout(aSchemaNr));
     } 
 
-    void Menu::incTimeout( byte aSchemaNr, boolean aPlus) {
+    void Menu::incTimeout( byte aSchemaNr, boolean aPlus, boolean aDelta10) {
         int timeOut = myThermos->geefTimeout(aSchemaNr);
         if (aPlus) { 
-          myThermos->incTimeout(aSchemaNr);
+          myThermos->incTimeout(aSchemaNr, aDelta10);
        } else {
-          myThermos->decTimeout(aSchemaNr);
+          myThermos->decTimeout(aSchemaNr, aDelta10);
        }     
     }
 
@@ -195,15 +195,21 @@
         myLCD->print("2=++ 3=--");
         
         byte keuze;
+        int aantalKerenPlus = 0;  // herhaald indrukken ineens plus 10
+        int aantalKerenMin = 0;   // analoog min 10
         do {
             delay(500);
             keuze = getMenuKey();
             if (keuze == 2) {
-                incTimeout(aSchemaNr, true);
+                aantalKerenMin = 0;
+                aantalKerenPlus++;
+                incTimeout(aSchemaNr, true, (aantalKerenPlus > 10));
                 toonTimeout(aSchemaNr);
             }
             if (keuze == 3) {
-                incTimeout(aSchemaNr, false);
+                aantalKerenPlus = 0;
+                aantalKerenMin++;
+                incTimeout(aSchemaNr, false, (aantalKerenMin > 10));
                 toonTimeout(aSchemaNr);
             }
          } while (keuze != 1);

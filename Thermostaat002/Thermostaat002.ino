@@ -176,7 +176,16 @@ void loop() {
   
   lcd.setCursor(0,5);
   lcd.print("1=menu");
-  
+
+
+  lcd.setCursor(0, 2);
+  byte bewSensor = analogRead(portBewegingssensor);
+  if (bewSensor > 20) {
+      lcd.print("BEWEGING");
+      mijnClock.startTimer();
+      mijnThermos.setSchemaActief();
+  };
+
   delay(1000);
 
   mijnMenu.checkMenuKey();
@@ -189,6 +198,6 @@ void loop() {
     }
   }
 
-
+ 
   
 }

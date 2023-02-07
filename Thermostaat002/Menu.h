@@ -27,5 +27,5 @@ class Menu {
       void verstelTimeout( byte aSchemaNr );
       void toonTemperaturen( byte aSchemaNr);
       void toonTimeout( byte aSchemaNr);
-      void incTimeout( byte aSchemaNr, boolean aPlus);
+      void incTimeout( byte aSchemaNr, boolean aPlus, boolean aDelta10);
 };

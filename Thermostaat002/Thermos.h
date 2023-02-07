@@ -22,11 +22,12 @@ class Thermos {
       byte   getHuidigSchemaNr();
       int   geefTimeout(byte aSchemaNr);
       boolean checkSetSchema(int aTimerMinuten);
+      void setSchemaActief();
 
       void incTempAan(byte aSchemaNr, double aIncrement);
       void incTempUit(byte aSchemaNr, double aIncrement);
-      void incTimeout(byte aSchemaNr);
-      void decTimeout(byte aSchemaNr);
+      void incTimeout(byte aSchemaNr, boolean aDelta10);
+      void decTimeout(byte aSchemaNr, boolean aDelta10);
 
 
    private:
