@@ -39,8 +39,9 @@
 
 #define portSensor A0
 
-#define portBewegingssensor A1
+#define portBewegingssensor A2
 // bewegingssensor heeft drie pootjes 
+// om overspraak te voorkomen op A0, die een hele kleine stroom krijgt van de NTC weerstand (in orde van 200 kOhm)
 
 #define portLedOut 13
 // poort 13 pin 19
@@ -65,21 +66,28 @@ Menu mijnMenu;
 
 void welcome() {
    lcd.setCursor(0,0);
-  lcd.print("WELCOME ..");
+  lcd.print("thermostaat");
   lcd.setCursor(0, 1);
-  lcd.print(" adriaans");
+  lcd.print(" 002.001");
   lcd.setCursor(0,2);
-  lcd.print("testlcd");
+  lcd.print("toilet");
   lcd.setCursor(0,3);
   lcd.print("controller");
   lcd.setCursor(0,4);
   lcd.print(":) :) :) ;)");
-    delay(1000); 
+    delay(2000); 
 }
 
 
 
 
+double avgTemp;
+int nAvg;
+// bij detecteren beweging verspringt de temperatuur.
+// om dit te voorkomen hanteren we een voortschrijdend gemiddelde over de laatste 10 seconden
+// avg = gemiddelde over laatste 10 perioden
+// avg := (9 * avg + temp)/10
+// eerste keer hanteren we als avgTemp de gewone meting
 
 //------------------- setup -----------------------
 void setup() {
@@ -89,7 +97,9 @@ void setup() {
   pinMode(portLedOut, OUTPUT);
   pinMode(portRelais, OUTPUT);
   pinMode(portSensor, INPUT);
-
+  digitalWrite(portSensor, LOW);
+  pinMode(portBewegingssensor, INPUT);
+  digitalWrite(portBewegingssensor, LOW);
   pinMode(portMenu0, INPUT);
   pinMode(portMenu1, INPUT);
   pinMode(portMenu2, INPUT);
@@ -109,15 +119,19 @@ void setup() {
   
   lcd.clear();
 
+  digitalWrite(portLedOut, HIGH);
   // rijtje menuknoppen zit precies andersom op de print
   mijnMenu.init(&lcd, &mijnThermos, portMenu2, portMenu1, portMenu0);
-  
+
+  nAvg = 0;
 
 }
 
 
-
+boolean isLedOn = false;
   char sBuffer[30];  
+
+
 
 // the loop function runs over and over again forever
 //----------------------------------------------------
@@ -128,6 +142,13 @@ void loop() {
   
   int senseValue = mijnTempSensor.meetTempSensor();
   double temp = mijnTempSensor.calcTemp(senseValue);
+
+  nAvg++;
+
+  if (nAvg == 1) avgTemp = temp;
+  avgTemp = (9.0 * avgTemp + temp ) / 10.0;
+  temp = avgTemp;
+  
   lcd.print(temp);
   lcd.print("      ");
   lcd.print(senseValue);
@@ -157,9 +178,6 @@ void loop() {
   }
 
   
-
-
-
   lcd.setCursor(0, 3);
   mijnThermos.geefSchemaNaam(sBuffer, mijnThermos.getHuidigSchemaNr());
   lcd.print(sBuffer);
@@ -189,6 +207,10 @@ void loop() {
   delay(1000);
 
   mijnMenu.checkMenuKey();
+
+  isLedOn = not(isLedOn);
+  if (isLedOn) digitalWrite(portLedOut, HIGH);
+  if (!isLedOn) digitalWrite(portLedOut, LOW);
 
   mijnClock.incSeconds(1);
   if (mijnClock.geefSeconden() %20 == 0) {

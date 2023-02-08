@@ -26,10 +26,10 @@ double TempSensor::calcTemp(int sensorValue) {
 int TempSensor::meetTempSensor () {
     int val;
   double tot = 0;
-  int nrtimes = 5;
+  int nrtimes = 10;
   for (int i = 1; i <= nrtimes; i++) {
        val = analogRead(sensorPort);
-      delayMicroseconds(200);
+      delayMicroseconds(100);
       val = analogRead(sensorPort);
       tot += val;
     }
