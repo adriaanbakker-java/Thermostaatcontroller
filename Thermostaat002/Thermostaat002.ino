@@ -25,7 +25,21 @@
      gelogd naar seriele poort
    - Bij de thermostaatcontroller zijn de NTC weerstand, menuknoppen en het display noodzakelijk
    - contactbusjes voor de verschillende componenten, led en menuknoppen zijn uiteraard altijd aanwezig op de print
+
+   2 maart 2023 11:00
+
+   De controller in het toilet BLIJFT crashen, af en toe. Met als gevolg dat de kachel blijft branden. Ook is het relaisje
+   kapot gegaan. Het relaisje is vervangen en inmiddels voorzien van een beschermend schakelingetje (een zogenaamd snubber circuit).
+   
+   Hoe ik het ook heb geprobeerd, met een hogere voedingsspanning, een tussengeschakelde arduino print (omdat die voorzien is
+   van een voedingsstabilisator), een extra condensator van 1000 microFarad, het blijft af en toe crashen.
+   Ik probeer het nu met de watchdog faciliteit waarmee de atmega standaard is uitgerust, zodat bij een crash het programma opnieuw opstart.
+
+  Het is vreemd, want de controller die ik in de slaapkamer gebruikt is nog niet een keer gecrasht. 
+  Misschien omdat ik daar van een atmega gebruik maak die nog op de arduino print zelf zit. Voor het overige zijn de schakelingen identiek of
+  vrijwel identiek.
 */
+
 
 #define portRelais  8
 // pin 14 hoog is relais aan, relaispinnen bovenaanzicht pinnen links: boven is vcc, midden signaal, onder gnd
@@ -64,6 +78,9 @@ Thermos mijnThermos;
 #include "Menu.h"
 Menu mijnMenu;
 
+#include "Watchdog.h"
+Watchdog watchdog;
+
 void welcome() {
    lcd.setCursor(0,0);
   lcd.print("thermostaat");
@@ -75,7 +92,7 @@ void welcome() {
   lcd.print("controller");
   lcd.setCursor(0,4);
   lcd.print(":) :) :) ;)");
-    delay(2000); 
+  watchdog.myDelay(2000); 
 }
 
 
@@ -91,6 +108,10 @@ int nAvg;
 
 //------------------- setup -----------------------
 void setup() {
+
+  watchdog.init();
+  
+ 
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -124,12 +145,16 @@ void setup() {
   mijnMenu.init(&lcd, &mijnThermos, portMenu2, portMenu1, portMenu0);
 
   nAvg = 0;
-
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("starting...");
+  
 }
 
 
 boolean isLedOn = false;
   char sBuffer[30];  
+
 
 
 
@@ -204,9 +229,11 @@ void loop() {
       mijnThermos.setSchemaActief();
   };
 
-  delay(1000);
+  watchdog.myDelay(1000);
 
+  watchdog.disable();
   mijnMenu.checkMenuKey();
+  watchdog.enable();
 
   isLedOn = not(isLedOn);
   if (isLedOn) digitalWrite(portLedOut, HIGH);

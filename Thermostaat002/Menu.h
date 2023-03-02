@@ -11,6 +11,7 @@ class Menu {
       PCD8544 * myLCD;
       Thermos * myThermos;
       
+      
       byte portKey0;
       byte portKey1;
       byte portKey2;
@@ -19,7 +20,7 @@ class Menu {
       void hoofdMenu();
       void actiefSchema();
       void pauzeSchema();
-
+      void myDelay(int aMsec);
 
       byte doSelect( char *titel, char *keuze1, char* keuze2, char* keuze3);
       void verstelTemperaturen( byte aSchemaNr );
@@ -28,4 +29,6 @@ class Menu {
       void toonTemperaturen( byte aSchemaNr);
       void toonTimeout( byte aSchemaNr);
       void incTimeout( byte aSchemaNr, boolean aPlus, boolean aDelta10);
+
+     
 };

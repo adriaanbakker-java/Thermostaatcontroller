@@ -1,24 +1,26 @@
 #include "Menu.h"
 #include "Thermos.h"
-
+  
+   
      void Menu::init( PCD8544 * aLCD, 
                       Thermos * aThermos,
                       byte aPortKey0, 
                       byte aPortKey1, 
                       byte aPortKey2) {
         myLCD = aLCD;
-        
         myThermos = aThermos;
+     
         
         portKey0 = aPortKey0;
         portKey1 = aPortKey1;
         portKey2 = aPortKey2;
      }
 
-  
+   
+
      void Menu::hoofdMenu() {
           byte key = doSelect("hoofdmenu", "actiefschema", "pauzeschema", "");
-
+            
              do {
                 if (key == 2) {
                    actiefSchema();
@@ -28,7 +30,7 @@
                    pauzeSchema();
                    return;
                 }
-                delay(1000);
+                myDelay(1000);
              } while (getMenuKey() != 1); 
      }
 
@@ -38,20 +40,24 @@
          }
      }
 
+     void Menu::myDelay(int aDelayMsec) {
+        delay(1000);
+     }
+
      byte Menu::getMenuKey() {
         if (digitalRead(portKey0) == HIGH) {
-          delay(200);
+          myDelay(200);
           if (digitalRead(portKey1) == HIGH) return 4; // 1,2 samen ingedrukt
           return 1;
         }
         if (digitalRead(portKey1) == HIGH) {
-          delay(200);
+          myDelay(200);
           if (digitalRead(portKey0) == HIGH) return 4; // 1,2 samen ingedrukt
           if (digitalRead(portKey2) == HIGH) return 5; // 2,3 samen ingedrukt
           return 2;
         }
         if (digitalRead(portKey2) == HIGH) {
-          delay(200);
+          myDelay(200);
           if (digitalRead(portKey1) == HIGH) return 5; // 2,3 samen ingedrukt
           return 3;
         }
@@ -81,7 +87,7 @@
          }
          
          byte keuze;
-         delay(1000);
+         myDelay(1000);
          do {
             keuze = getMenuKey();
          } while (keuze == 0);
@@ -156,7 +162,7 @@
         
         byte keuze;
         do {
-            delay(500);
+            myDelay(500);
             keuze = getMenuKey();
             if (keuze == 2) verstelTemperatuur(aSchemaNr, true, true);
             if (keuze == 3)  verstelTemperatuur(aSchemaNr, true, false);
@@ -198,7 +204,7 @@
         int aantalKerenPlus = 0;  // herhaald indrukken ineens plus 10
         int aantalKerenMin = 0;   // analoog min 10
         do {
-            delay(500);
+            myDelay(500);
             keuze = getMenuKey();
             if (keuze == 2) {
                 aantalKerenMin = 0;
